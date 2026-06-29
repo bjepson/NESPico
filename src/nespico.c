@@ -30,6 +30,7 @@
 #include "bsp/board.h"
 #include "hardware/gpio.h"
 #include "tusb.h"
+#include "pico/stdlib.h"
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
@@ -61,8 +62,9 @@ enum BTN_IDX {
   PHYS_B = 1,
   PHYS_SELECT = 2,
   PHYS_START = 3,
-  PHYS_DOWN = 4,
-  PHYS_UP = 5,
+  // Need to swap these for some reason, otherwise the hat direction is wrong
+  PHYS_DOWN = 5,
+  PHYS_UP = 4,
   PHYS_LEFT = 6,
   PHYS_RIGHT = 7,
   PHYS_TOTAL = 8,
@@ -76,6 +78,7 @@ void setup_gpios(void);
 
 /*------------- MAIN -------------*/
 int main(void) {
+  stdio_init_all();
   board_init();
   tusb_init();
 
@@ -170,8 +173,14 @@ void update_nes_report(hid_gamepad_report_t *report, uint8_t input) {
   // Button data
   report->buttons |= (input & (0x1 << PHYS_A)) ? GAMEPAD_BUTTON_A : 0;
   report->buttons |= (input & (0x1 << PHYS_B)) ? GAMEPAD_BUTTON_B : 0;
-  report->buttons |= (input & (0x1 << PHYS_SELECT)) ? GAMEPAD_BUTTON_SELECT : 0;
-  report->buttons |= (input & (0x1 << PHYS_START)) ? GAMEPAD_BUTTON_START : 0;
+
+  // if both PHYS_SELECT and PHYS_START are pressed, send GAMEPAD_BUTTON_TL
+  if ((input & (0x1 << PHYS_SELECT)) && (input & (0x1 << PHYS_START))) {
+    report->buttons |= GAMEPAD_BUTTON_TL;
+  } else {
+    report->buttons |= (input & (0x1 << PHYS_SELECT)) ? GAMEPAD_BUTTON_C : 0;
+    report->buttons |= (input & (0x1 << PHYS_START)) ? GAMEPAD_BUTTON_TR : 0;
+  }
 
   // Hat data
   if (input & (0x1 << PHYS_UP))
