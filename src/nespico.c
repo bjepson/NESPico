@@ -30,7 +30,6 @@
 #include "bsp/board.h"
 #include "hardware/gpio.h"
 #include "tusb.h"
-#include "pico/stdlib.h"
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
@@ -78,7 +77,6 @@ void setup_gpios(void);
 
 /*------------- MAIN -------------*/
 int main(void) {
-  stdio_init_all();
   board_init();
   tusb_init();
 

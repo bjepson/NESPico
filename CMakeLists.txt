@@ -13,8 +13,6 @@ pico_sdk_init()
 add_executable(nespico src/nespico.c src/usb_descriptors.c)
 target_include_directories(nespico PRIVATE include)
 target_link_libraries(nespico PRIVATE pico_stdlib pico_unique_id tinyusb_device tinyusb_board)
-pico_enable_stdio_usb(nespico 1)
-pico_enable_stdio_uart(nespico 0)
 pico_add_extra_outputs(nespico)
 
 set(NESPICO_BIN nespico.uf2)
